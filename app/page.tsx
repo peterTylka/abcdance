@@ -40,7 +40,7 @@ function readAloud(
 // TODO: android higher volume on browser ?
 // deploy to Vercel - https://abcdance.vercel.app/
 export default function Home() {
-  const [dance, setDance] = useState(Dance.Bachata);
+  const [dance, setDance] = useState(Dance['Bachata All']);
   const [delaySeconds, setDelaySeconds] = useState(6);
   // TODO: randomize figures with button
   // TODO: CRUD remove some figures
@@ -49,12 +49,13 @@ export default function Home() {
   const [currentFigure, setCurrentFigure] = useState('');
   const figureElementsRefs = useRef({});
 
-  console.log('%c dance', 'background-color: skyblue', {
-    dance,
-    refs: figureElementsRefs.current,
-  });
+  // console.log('%c dance', 'background-color: skyblue', {
+  //   dance,
+  //   refs: figureElementsRefs.current,
+  // });
 
   useEffect(() => {
+    //@ts-expect-error improve types
     const el = figureElementsRefs.current[currentFigure];
     if (el) {
       el.scrollIntoView({
@@ -68,6 +69,7 @@ export default function Home() {
     if (nextReadTimeoutId) {
       clearTimeout(nextReadTimeoutId);
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentFigure('');
   }, [delaySeconds, dance, setCurrentFigure]);
 
@@ -129,6 +131,7 @@ export default function Home() {
           {figures.map((figure) => (
             <li
               key={figure}
+              // @ts-expect-error improve types
               ref={(el) => (figureElementsRefs.current[figure] = el)}
               className={`${currentFigure === figure ? 'font-extrabold text-6xl' : 'font-normal'}`}
             >
