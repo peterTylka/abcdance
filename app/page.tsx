@@ -40,7 +40,6 @@ function readAloud(
 // deploy to Vercel - https://abcdance.vercel.app/
 export default function Home() {
   const [dance, setDance] = useState(Dance.Bachata);
-  // TODO: input + button to change delay
   const [delaySeconds, setDelaySeconds] = useState(6);
   // TODO: randomize figures with button
   // TODO: CRUD remove some figures
@@ -69,14 +68,39 @@ export default function Home() {
             ))}
           </div>
 
-          <button
-            className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
-            onClick={() => {
-              readAloud(figures, delaySeconds * 1000, setCurrentFigure);
-            }}
-          >
-            READ FIGURES
-          </button>
+          <div className="flex gap-3">
+            <div className="flex items-center border rounded-md overflow-hidden w-fit">
+              <button
+                className="px-3 py-2 bg-gray-100 hover:bg-gray-200"
+                onClick={() => {
+                  setDelaySeconds(delaySeconds - 1);
+                }}
+              >
+                −
+              </button>
+              <input
+                type="number"
+                className="w-16 text-center outline-none"
+                value={delaySeconds}
+              />
+              <button
+                className="px-3 py-2 bg-gray-100 hover:bg-gray-200"
+                onClick={() => {
+                  setDelaySeconds(delaySeconds + 1);
+                }}
+              >
+                +
+              </button>
+            </div>
+            <button
+              className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
+              onClick={() => {
+                readAloud(figures, delaySeconds * 1000, setCurrentFigure);
+              }}
+            >
+              READ FIGURES
+            </button>
+          </div>
         </nav>
         <div className="font-bold">Figures:</div>
         <ul>
