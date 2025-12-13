@@ -1,7 +1,9 @@
 'use client';
 
 import { Dance, DEFAULT_DANCES } from '@/lib/constants';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+let nextReadTimeoutId = 0;
 
 function readAloud(
   texts: string[],
@@ -21,7 +23,8 @@ function readAloud(
     });
     const utterance = new SpeechSynthesisUtterance(texts[index]);
     utterance.onend = () => {
-      setTimeout(() => {
+      //@ts-expect-error should be number
+      nextReadTimeoutId = setTimeout(() => {
         index++;
         readNext();
       }, delay);
@@ -35,8 +38,6 @@ function readAloud(
 
 // TODO: nicer UI
 // TODO: android higher volume on browser ?
-// TODO: show current figure which is played aloud
-// TODO: stop playing on list change
 // deploy to Vercel - https://abcdance.vercel.app/
 export default function Home() {
   const [dance, setDance] = useState(Dance.Bachata);
@@ -48,6 +49,13 @@ export default function Home() {
   const [currentFigure, setCurrentFigure] = useState('');
 
   console.log('%c dance', 'background-color: skyblue', { dance });
+
+  useEffect(() => {
+    if (nextReadTimeoutId) {
+      clearTimeout(nextReadTimeoutId);
+    }
+    setCurrentFigure('');
+  }, [delaySeconds, dance, setCurrentFigure]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -107,7 +115,7 @@ export default function Home() {
           {figures.map((figure) => (
             <li
               key={figure}
-              className={`${currentFigure === figure ? 'font-bold text-4xl' : 'font-normal'}`}
+              className={`${currentFigure === figure ? 'font-extrabold text-6xl' : 'font-normal'}`}
             >
               {figure}
             </li>
