@@ -36,23 +36,27 @@ function readAloud(
   readNext();
 }
 
+function shuffleCopy(array: string[]) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 // TODO: nicer UI
 // TODO: android higher volume on browser ?
 // deploy to Vercel - https://abcdance.vercel.app/
 export default function Home() {
   const [dance, setDance] = useState(Dance['Bachata All']);
   const [delaySeconds, setDelaySeconds] = useState(6);
-  // TODO: randomize figures with button
   // TODO: CRUD remove some figures
   // TODO: lists - Kizomba ALL, Kizomba Advanced etc.
-  const figures = DEFAULT_DANCES[dance];
+  const [figures, setFigures] = useState(DEFAULT_DANCES[dance]);
   const [currentFigure, setCurrentFigure] = useState('');
   const figureElementsRefs = useRef({});
-
-  // console.log('%c dance', 'background-color: skyblue', {
-  //   dance,
-  //   refs: figureElementsRefs.current,
-  // });
+  const figuresTitleElRef = useRef(null);
 
   useEffect(() => {
     //@ts-expect-error improve types
@@ -65,14 +69,6 @@ export default function Home() {
     }
   }, [currentFigure]);
 
-  useEffect(() => {
-    if (nextReadTimeoutId) {
-      clearTimeout(nextReadTimeoutId);
-    }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrentFigure('');
-  }, [delaySeconds, dance, setCurrentFigure]);
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-left py-3 px-3 bg-white dark:bg-black sm:items-start">
@@ -84,7 +80,16 @@ export default function Home() {
                 disabled={dance === danceItem}
                 className={`px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 ${dance === danceItem ? 'bg-green-600' : 'bg-blue-600'}`}
                 onClick={() => {
+                  clearTimeout(nextReadTimeoutId);
                   setDance(danceItem as Dance);
+                  //@ts-expect-error improve types
+                  setFigures(DEFAULT_DANCES[danceItem]);
+                  setCurrentFigure('');
+                  //@ts-expect-error improve types
+                  figuresTitleElRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                  });
                 }}
               >
                 {danceItem}
@@ -97,6 +102,7 @@ export default function Home() {
               <button
                 className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                 onClick={() => {
+                  clearTimeout(nextReadTimeoutId);
                   setDelaySeconds(delaySeconds - 1);
                 }}
               >
@@ -110,6 +116,7 @@ export default function Home() {
               <button
                 className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                 onClick={() => {
+                  clearTimeout(nextReadTimeoutId);
                   setDelaySeconds(delaySeconds + 1);
                 }}
               >
@@ -119,14 +126,30 @@ export default function Home() {
             <button
               className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
               onClick={() => {
-                readAloud(figures, delaySeconds * 1000, setCurrentFigure);
+                clearTimeout(nextReadTimeoutId);
+                const finalFigures = DEFAULT_DANCES[dance];
+                setFigures(finalFigures);
+                readAloud(finalFigures, delaySeconds * 1000, setCurrentFigure);
               }}
             >
-              READ FIGURES
+              READ
+            </button>
+            <button
+              className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
+              onClick={() => {
+                clearTimeout(nextReadTimeoutId);
+                const finalFigures = shuffleCopy(DEFAULT_DANCES[dance]);
+                setFigures(finalFigures);
+                readAloud(finalFigures, delaySeconds * 1000, setCurrentFigure);
+              }}
+            >
+              SHUFFLE READ
             </button>
           </div>
         </nav>
-        <div className="font-bold">Figures:</div>
+        <div ref={figuresTitleElRef} className="font-bold">
+          Figures:
+        </div>
         <ul>
           {figures.map((figure) => (
             <li
