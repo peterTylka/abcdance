@@ -1,7 +1,7 @@
 'use client';
 
 import { Dance, DEFAULT_DANCES } from '@/lib/constants';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 let nextReadTimeoutId = 0;
 
@@ -47,8 +47,22 @@ export default function Home() {
   // TODO: lists - Kizomba ALL, Kizomba Advanced etc.
   const figures = DEFAULT_DANCES[dance];
   const [currentFigure, setCurrentFigure] = useState('');
+  const figureElementsRefs = useRef({});
 
-  console.log('%c dance', 'background-color: skyblue', { dance });
+  console.log('%c dance', 'background-color: skyblue', {
+    dance,
+    refs: figureElementsRefs.current,
+  });
+
+  useEffect(() => {
+    const el = figureElementsRefs.current[currentFigure];
+    if (el) {
+      el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [currentFigure]);
 
   useEffect(() => {
     if (nextReadTimeoutId) {
@@ -60,7 +74,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-left py-3 px-3 bg-white dark:bg-black sm:items-start">
-        <nav className="flex flex-col gap-3 mb-3">
+        <nav className="flex flex-col gap-3 mb-3 sticky top-0 z-50">
           <div className="flex flex-wrap gap-3 mb-3">
             {Object.keys(Dance).map((danceItem) => (
               <button
@@ -79,7 +93,7 @@ export default function Home() {
           <div className="flex gap-3">
             <div className="flex items-center border rounded-md overflow-hidden w-fit">
               <button
-                className="px-3 py-2 bg-gray-100 hover:bg-gray-200"
+                className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                 onClick={() => {
                   setDelaySeconds(delaySeconds - 1);
                 }}
@@ -92,7 +106,7 @@ export default function Home() {
                 value={delaySeconds}
               />
               <button
-                className="px-3 py-2 bg-gray-100 hover:bg-gray-200"
+                className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                 onClick={() => {
                   setDelaySeconds(delaySeconds + 1);
                 }}
@@ -115,6 +129,7 @@ export default function Home() {
           {figures.map((figure) => (
             <li
               key={figure}
+              ref={(el) => (figureElementsRefs.current[figure] = el)}
               className={`${currentFigure === figure ? 'font-extrabold text-6xl' : 'font-normal'}`}
             >
               {figure}
