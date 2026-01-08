@@ -45,6 +45,8 @@ function shuffleCopy(array: string[]) {
   return copy;
 }
 
+// TODO: beats per figure => compute how long it should stay
+// TODO: number of repeats :)
 // TODO: nicer UI
 // TODO: android higher volume on browser ?
 // deploy to Vercel - https://abcdance.vercel.app/
