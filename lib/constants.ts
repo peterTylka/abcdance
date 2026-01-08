@@ -14,7 +14,7 @@ const Bachata_Otocky = [
   'Zadna Otocka - Dama',
   'Zadna Otocka - Panska',
   'Protismerna Otocka - Dama',
-  // 'Protismerna Otocka - Panska',
+  'Protismerna Otocka - Panska',
 ];
 
 const Bachata_Basic_2 = [
@@ -29,9 +29,10 @@ const Bachata_Basic_2 = [
 const Bachata_Variacky = [
   'Milos Nizny stierac',
   'Milos Nizna tocka shadow',
-  'Mirec Variacka 1',
-  'Mirec Variacka 2',
-  'Mirec Variacka 3',
+  'Mirec Variacka 6 - pritahovacka odtahovacka i 90 odtlacenie',
+  'Mirec Variacka 7 - obchadzka a chrbtovy titanik',
+  'Mirec Variacka 8 - cardas a zaklanacka',
+  'Mirec Variacka 9 - brusko a follower shadow',
 ];
 
 const Salsa_Variacky = [
