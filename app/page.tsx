@@ -1,42 +1,50 @@
 'use client';
 
-import { Dance, DEFAULT_DANCES } from '@/lib/constants';
+import { Dance, DanceFigure, DEFAULT_DANCES } from '@/lib/constants';
 import { useEffect, useRef, useState } from 'react';
 
 let nextReadTimeoutId = 0;
 
+// basicDelay is meant for 8 beats so compute figure delay
+function computeFigureDelay(basicDelay: number, figureBeats: number) {
+  return basicDelay * (figureBeats / 8);
+}
+
 function readAloud(
-  texts: string[],
+  figures: DanceFigure[],
+  // delay is meant for 8 beats
   delay: number,
   setCurrentFigure: (text: string) => void
 ) {
   let index = 0;
 
   function readNext() {
-    if (index >= texts.length) return;
+    if (index >= figures.length) return;
 
+    const computedDelay = computeFigureDelay(delay, figures[index].beats);
     console.log('%c read next', 'background-color: skyblue', {
-      texts,
+      figures,
+      computedDelay,
       delay,
       index,
-      text: texts[index],
+      text: figures[index],
     });
-    const utterance = new SpeechSynthesisUtterance(texts[index]);
+    const utterance = new SpeechSynthesisUtterance(figures[index].name);
     utterance.onend = () => {
       //@ts-expect-error should be number
       nextReadTimeoutId = setTimeout(() => {
         index++;
         readNext();
-      }, delay);
+      }, computedDelay);
     };
-    setCurrentFigure(texts[index]);
+    setCurrentFigure(figures[index].name);
     speechSynthesis.speak(utterance);
   }
 
   readNext();
 }
 
-function shuffleCopy(array: string[]) {
+function shuffleCopy<T>(array: T[]): T[] {
   const copy = [...array];
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -56,20 +64,20 @@ export default function Home() {
   // TODO: CRUD remove some figures
   // TODO: lists - Kizomba ALL, Kizomba Advanced etc.
   const [figures, setFigures] = useState(DEFAULT_DANCES[dance]);
-  const [currentFigure, setCurrentFigure] = useState('');
+  const [currentFigureName, setCurrentFigureName] = useState('');
   const figureElementsRefs = useRef({});
   const figuresTitleElRef = useRef(null);
 
   useEffect(() => {
     //@ts-expect-error improve types
-    const el = figureElementsRefs.current[currentFigure];
+    const el = figureElementsRefs.current[currentFigureName];
     if (el) {
       el.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
       });
     }
-  }, [currentFigure]);
+  }, [currentFigureName]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -86,7 +94,7 @@ export default function Home() {
                   setDance(danceItem as Dance);
                   //@ts-expect-error improve types
                   setFigures(DEFAULT_DANCES[danceItem]);
-                  setCurrentFigure('');
+                  setCurrentFigureName('');
                   //@ts-expect-error improve types
                   figuresTitleElRef.current?.scrollIntoView({
                     behavior: 'smooth',
@@ -131,7 +139,11 @@ export default function Home() {
                 clearTimeout(nextReadTimeoutId);
                 const finalFigures = DEFAULT_DANCES[dance];
                 setFigures(finalFigures);
-                readAloud(finalFigures, delaySeconds * 1000, setCurrentFigure);
+                readAloud(
+                  finalFigures,
+                  delaySeconds * 1000,
+                  setCurrentFigureName
+                );
               }}
             >
               READ
@@ -142,7 +154,11 @@ export default function Home() {
                 clearTimeout(nextReadTimeoutId);
                 const finalFigures = shuffleCopy(DEFAULT_DANCES[dance]);
                 setFigures(finalFigures);
-                readAloud(finalFigures, delaySeconds * 1000, setCurrentFigure);
+                readAloud(
+                  finalFigures,
+                  delaySeconds * 1000,
+                  setCurrentFigureName
+                );
               }}
             >
               SHUFFLE READ
@@ -155,12 +171,12 @@ export default function Home() {
         <ul>
           {figures.map((figure) => (
             <li
-              key={figure}
+              key={figure.name}
               // @ts-expect-error improve types
               ref={(el) => (figureElementsRefs.current[figure] = el)}
-              className={`${currentFigure === figure ? 'font-extrabold text-6xl' : 'font-normal'}`}
+              className={`${currentFigureName === figure.name ? 'font-extrabold text-6xl' : 'font-normal'}`}
             >
-              {figure}
+              {figure.name}({figure.beats})
             </li>
           ))}
         </ul>
