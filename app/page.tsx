@@ -122,6 +122,10 @@ export default function Home() {
                 type="number"
                 className="w-16 text-center outline-none"
                 value={delaySeconds}
+                onChange={(e) => {
+                  clearTimeout(nextReadTimeoutId);
+                  setDelaySeconds(parseInt(e.target.value));
+                }}
               />
               <button
                 className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
