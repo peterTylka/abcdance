@@ -5,6 +5,7 @@ import { Dance, DanceFigure, DEFAULT_DANCES } from '@/lib/dance-figures';
 import { useEffect, useRef, useState } from 'react';
 
 let nextReadTimeoutId = 1;
+let stopped = false;
 
 /**
  * compute wait time for figure based on BPM + add time for basic steps
@@ -22,21 +23,22 @@ function readAloud(
   let index = 0;
 
   function readNext() {
+    if (stopped) {
+      clearTimeout(nextReadTimeoutId);
+      return;
+    }
+
     if (index >= figures.length) return;
 
     const computedDelay = computeFigureDelayMs(bpm, figures[index].beats);
-    console.log('%c read next', 'background-color: skyblue', {
-      figures,
-      computedDelay,
-      bpm,
-      index,
-      text: figures[index],
-    });
     const utterance = new SpeechSynthesisUtterance(figures[index].name);
     utterance.onend = () => {
       //@ts-expect-error should be number
       nextReadTimeoutId = setTimeout(() => {
-        index++;
+        // repeat / loop figures
+        const isLastIndex = index + 1 === figures.length;
+        index = isLastIndex ? 0 : index + 1;
+
         readNext();
       }, computedDelay);
     };
@@ -56,16 +58,17 @@ function shuffleCopy<T>(array: T[]): T[] {
   return copy;
 }
 
-// TODO: beats per figure => compute how long it should stay
+// TODO: disable figure in current list / resets on change
 // TODO: number of repeats :)
 // TODO: nicer UI
 // TODO: android higher volume on browser ?
+// TODO: lists - Kizomba ALL, Kizomba Advanced etc.
+// TODO: CRUD remove some figures
 // deploy to Vercel - https://abcdance.vercel.app/
+
 export default function Home() {
   const [dance, setDance] = useState(Dance['Bachata All']);
   const [bpm, setBpm] = useState(BPM_DEFAULT.BACHATA);
-  // TODO: CRUD remove some figures
-  // TODO: lists - Kizomba ALL, Kizomba Advanced etc.
   const [figures, setFigures] = useState(DEFAULT_DANCES[dance]);
   const [currentFigureName, setCurrentFigureName] = useState('');
   const figureElementsRefs = useRef({});
@@ -93,6 +96,7 @@ export default function Home() {
                 disabled={dance === danceItem}
                 className={`px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 ${dance === danceItem ? 'bg-green-600' : 'bg-blue-600'}`}
                 onClick={() => {
+                  stopped = true;
                   clearTimeout(nextReadTimeoutId);
                   setDance(danceItem as Dance);
                   setBpm(
@@ -124,6 +128,7 @@ export default function Home() {
                 <button
                   className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                   onClick={() => {
+                    stopped = true;
                     clearTimeout(nextReadTimeoutId);
                     setBpm(bpm - 1);
                   }}
@@ -135,6 +140,7 @@ export default function Home() {
                   className="w-16 text-center outline-none"
                   value={bpm}
                   onChange={(e) => {
+                    stopped = true;
                     clearTimeout(nextReadTimeoutId);
                     setBpm(Number(e.target.value));
                   }}
@@ -142,6 +148,7 @@ export default function Home() {
                 <button
                   className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                   onClick={() => {
+                    stopped = true;
                     clearTimeout(nextReadTimeoutId);
                     setBpm(bpm + 1);
                   }}
@@ -154,6 +161,7 @@ export default function Home() {
               <button
                 className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
                 onClick={() => {
+                  stopped = false;
                   clearTimeout(nextReadTimeoutId);
                   const finalFigures = DEFAULT_DANCES[dance];
                   setFigures(finalFigures);
@@ -165,6 +173,7 @@ export default function Home() {
               <button
                 className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
                 onClick={() => {
+                  stopped = false;
                   clearTimeout(nextReadTimeoutId);
                   const finalFigures = shuffleCopy(DEFAULT_DANCES[dance]);
                   setFigures(finalFigures);
@@ -176,6 +185,7 @@ export default function Home() {
               <button
                 className={`px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
                 onClick={() => {
+                  stopped = true;
                   clearTimeout(nextReadTimeoutId);
                   setCurrentFigureName('');
                 }}
@@ -196,7 +206,7 @@ export default function Home() {
               ref={(el) => (figureElementsRefs.current[figure] = el)}
               className={`${currentFigureName === figure.name ? 'font-extrabold text-6xl' : 'font-normal'}`}
             >
-              {figure.name}({figure.beats})
+              {`${figure.name} (${figure.beats})`}
             </li>
           ))}
         </ul>
