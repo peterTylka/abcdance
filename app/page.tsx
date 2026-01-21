@@ -1,19 +1,22 @@
 'use client';
 
-import { Dance, DanceFigure, DEFAULT_DANCES } from '@/lib/constants';
+import { BPM_DEFAULT } from '@/lib/bpm';
+import { Dance, DanceFigure, DEFAULT_DANCES } from '@/lib/dance-figures';
 import { useEffect, useRef, useState } from 'react';
 
-let nextReadTimeoutId = 0;
+let nextReadTimeoutId = 1;
 
-// basicDelay is meant for 8 beats so compute figure delay
-function computeFigureDelay(basicDelay: number, figureBeats: number) {
-  return basicDelay * (figureBeats / 8);
+/**
+ * compute wait time for figure based on BPM + add time for basic steps
+ */
+function computeFigureDelayMs(bpm: number, figureBeats: number) {
+  const beatToSeconds = 60 / bpm;
+  return (figureBeats + 8) * beatToSeconds * 1000;
 }
 
 function readAloud(
   figures: DanceFigure[],
-  // delay is meant for 8 beats
-  delay: number,
+  bpm: number,
   setCurrentFigure: (text: string) => void
 ) {
   let index = 0;
@@ -21,11 +24,11 @@ function readAloud(
   function readNext() {
     if (index >= figures.length) return;
 
-    const computedDelay = computeFigureDelay(delay, figures[index].beats);
+    const computedDelay = computeFigureDelayMs(bpm, figures[index].beats);
     console.log('%c read next', 'background-color: skyblue', {
       figures,
       computedDelay,
-      delay,
+      bpm,
       index,
       text: figures[index],
     });
@@ -60,7 +63,7 @@ function shuffleCopy<T>(array: T[]): T[] {
 // deploy to Vercel - https://abcdance.vercel.app/
 export default function Home() {
   const [dance, setDance] = useState(Dance['Bachata All']);
-  const [delaySeconds, setDelaySeconds] = useState(6);
+  const [bpm, setBpm] = useState(BPM_DEFAULT.BACHATA);
   // TODO: CRUD remove some figures
   // TODO: lists - Kizomba ALL, Kizomba Advanced etc.
   const [figures, setFigures] = useState(DEFAULT_DANCES[dance]);
@@ -92,6 +95,13 @@ export default function Home() {
                 onClick={() => {
                   clearTimeout(nextReadTimeoutId);
                   setDance(danceItem as Dance);
+                  setBpm(
+                    danceItem.includes('Bachata')
+                      ? BPM_DEFAULT.BACHATA
+                      : danceItem.includes('Salsa')
+                        ? BPM_DEFAULT.SALSA
+                        : BPM_DEFAULT.KIZOMBA
+                  );
                   //@ts-expect-error improve types
                   setFigures(DEFAULT_DANCES[danceItem]);
                   setCurrentFigureName('');
@@ -107,13 +117,15 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="flex gap-3">
-            <div className="flex items-center border rounded-md overflow-hidden w-fit">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex gap-3">
+              <div className="flex items-center font-semibold">BPM</div>
+              <div className="flex items-center border rounded-md overflow-hidden w-fit"></div>
               <button
                 className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                 onClick={() => {
                   clearTimeout(nextReadTimeoutId);
-                  setDelaySeconds(delaySeconds - 1);
+                  setBpm(bpm - 1);
                 }}
               >
                 −
@@ -121,52 +133,54 @@ export default function Home() {
               <input
                 type="number"
                 className="w-16 text-center outline-none"
-                value={delaySeconds}
+                value={bpm}
                 onChange={(e) => {
                   clearTimeout(nextReadTimeoutId);
-                  setDelaySeconds(parseInt(e.target.value));
+                  setBpm(Number(e.target.value));
                 }}
               />
               <button
                 className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
                 onClick={() => {
                   clearTimeout(nextReadTimeoutId);
-                  setDelaySeconds(delaySeconds + 1);
+                  setBpm(bpm + 1);
                 }}
               >
                 +
               </button>
             </div>
-            <button
-              className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
-              onClick={() => {
-                clearTimeout(nextReadTimeoutId);
-                const finalFigures = DEFAULT_DANCES[dance];
-                setFigures(finalFigures);
-                readAloud(
-                  finalFigures,
-                  delaySeconds * 1000,
-                  setCurrentFigureName
-                );
-              }}
-            >
-              READ
-            </button>
-            <button
-              className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
-              onClick={() => {
-                clearTimeout(nextReadTimeoutId);
-                const finalFigures = shuffleCopy(DEFAULT_DANCES[dance]);
-                setFigures(finalFigures);
-                readAloud(
-                  finalFigures,
-                  delaySeconds * 1000,
-                  setCurrentFigureName
-                );
-              }}
-            >
-              SHUFFLE READ
-            </button>
+            <div className="flex gap-3">
+              <button
+                className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
+                onClick={() => {
+                  clearTimeout(nextReadTimeoutId);
+                  const finalFigures = DEFAULT_DANCES[dance];
+                  setFigures(finalFigures);
+                  readAloud(finalFigures, bpm, setCurrentFigureName);
+                }}
+              >
+                READ
+              </button>
+              <button
+                className={`px-4 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
+                onClick={() => {
+                  clearTimeout(nextReadTimeoutId);
+                  const finalFigures = shuffleCopy(DEFAULT_DANCES[dance]);
+                  setFigures(finalFigures);
+                  readAloud(finalFigures, bpm, setCurrentFigureName);
+                }}
+              >
+                SHUFFLE READ
+              </button>
+              <button
+                className={`px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
+                onClick={() => {
+                  clearTimeout(nextReadTimeoutId);
+                }}
+              >
+                STOP
+              </button>
+            </div>
           </div>
         </nav>
         <div ref={figuresTitleElRef} className="font-bold">
