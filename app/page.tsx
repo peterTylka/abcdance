@@ -89,7 +89,7 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-left py-3 px-3 bg-white dark:bg-black sm:items-start">
         <nav className="flex flex-col gap-3 mb-3 sticky top-0 z-50">
-          <div className="flex flex-wrap gap-3 mb-3">
+          <div className="flex flex-wrap gap-2 md:gap-3 mb-1 md:mb-3">
             {Object.keys(Dance).map((danceItem) => (
               <button
                 key={danceItem}
@@ -116,7 +116,7 @@ export default function Home() {
                   });
                 }}
               >
-                {danceItem}
+                {danceItem.replace('Bachata ', '')}
               </button>
             ))}
           </div>

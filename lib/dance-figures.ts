@@ -34,6 +34,46 @@ const Bachata_Basic_2: DanceFigure[] = [
   { name: 'V - dozadu dopredu s natacanim tela', beats: 8 },
 ];
 
+const Bachata_L2: DanceFigure[] = [
+  { name: 'Zadne protismerky', beats: 8 },
+  { name: 'Dvojita otocka', beats: 8 },
+  { name: 'Slide', beats: 8 },
+  { name: 'Kulito', beats: 8 },
+];
+
+const Bachata_L2_Flipy: DanceFigure[] = [
+  {
+    name: 'Flip - zakladna - zahodenie, zahodenie za chrbat, vyhodenie zo zadu, polozenie',
+    beats: 16,
+  },
+  { name: 'Flip - trampolina - lava', beats: 8 },
+  { name: 'Flip - trampolina - obojrucna', beats: 8 },
+  { name: 'Flip - z otocky  (stierac)', beats: 8 },
+  { name: 'Flip - z otocky  complicado', beats: 8 },
+  { name: 'Flip - zo spodu - motorkar', beats: 8 },
+  { name: 'Flip - senzual - kriz', beats: 16 },
+];
+
+const Bachata_L2_Vymeny_stran: DanceFigure[] = [
+  { name: 'Vymena stran zo spoloconej tocky', beats: 8 },
+  { name: 'Vymena stran open breaky', beats: 8 },
+  { name: 'Vymena stran Lko', beats: 8 },
+];
+
+const Bachata_L2_Zmeny_garde: DanceFigure[] = [
+  { name: 'Zmena garde prekrocenim', beats: 16 },
+  { name: 'Zmena garde otockou z pizze', beats: 16 },
+  { name: 'Zmena garde otockou z pizze 2 s chodenim poza na kriz', beats: 24 },
+  { name: 'Zmena garde rumpom s pol a celou tockou', beats: 16 },
+  { name: 'Zmena garde rumpom sensual', beats: 16 },
+];
+
+const Bachata_L2_Kroky: DanceFigure[] = [
+  { name: 'Chacha', beats: 16 },
+  { name: 'Chacha prekrizena', beats: 16 },
+  { name: '1a3tuk', beats: 16 },
+];
+
 const Bachata_Variacky: DanceFigure[] = [
   {
     name: 'Mirec Variacka 6 - pritahovacka odtahovacka i 90 odtlacenie',
@@ -122,12 +162,34 @@ export const DEFAULT_DANCES = {
   'Bachata Basic': Bachata_Basic,
   'Bachata Otocky': Bachata_Otocky,
   'Bachata Basic 2': Bachata_Basic_2,
+  'Bachata L2 All': [
+    ...Bachata_L2,
+    ...Bachata_L2_Flipy,
+    ...Bachata_L2_Vymeny_stran,
+    ...Bachata_L2_Zmeny_garde,
+    ...Bachata_L2_Kroky,
+  ],
+  'Bachata L2 Flipy': Bachata_L2_Flipy,
+  'Bachata L2 Vymeny stran': Bachata_L2_Vymeny_stran,
+  'Bachata L2 Zmeny garde': Bachata_L2_Zmeny_garde,
+  'Bachata L2 Kroky': Bachata_L2_Kroky,
   'Bachata Variacky': Bachata_Variacky,
+  'Bachata L1 All': [
+    ...Bachata_Basic,
+    ...Bachata_Otocky,
+    ...Bachata_Basic_2,
+    ...Bachata_Variacky,
+  ],
   'Bachata All': [
     ...Bachata_Basic,
     ...Bachata_Otocky,
     ...Bachata_Basic_2,
     ...Bachata_Variacky,
+    ...Bachata_L2,
+    ...Bachata_L2_Flipy,
+    ...Bachata_L2_Vymeny_stran,
+    ...Bachata_L2_Zmeny_garde,
+    ...Bachata_L2_Kroky,
   ],
   Salsa: [...Salsa_Basic, ...Salsa_Variacky],
   'Salsa Variacky': Salsa_Variacky,
