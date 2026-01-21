@@ -125,7 +125,7 @@ const Salsa_Variacky: DanceFigure[] = [
   { name: 'Iko plavanie', beats: 8 },
   { name: 'Iko Zilinska vasilla', beats: 8 },
   { name: 'Iko Zilinska setenta complicado', beats: 8 },
-  { name: 'Ikoa la Klacno', beats: 8 },
+  { name: 'Iko a la Klacno', beats: 8 },
 ];
 
 // TODO beats
