@@ -120,34 +120,35 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex gap-3">
               <div className="flex items-center font-semibold">BPM</div>
-              <div className="flex items-center border rounded-md overflow-hidden w-fit"></div>
-              <button
-                className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
-                onClick={() => {
-                  clearTimeout(nextReadTimeoutId);
-                  setBpm(bpm - 1);
-                }}
-              >
-                −
-              </button>
-              <input
-                type="number"
-                className="w-16 text-center outline-none"
-                value={bpm}
-                onChange={(e) => {
-                  clearTimeout(nextReadTimeoutId);
-                  setBpm(Number(e.target.value));
-                }}
-              />
-              <button
-                className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
-                onClick={() => {
-                  clearTimeout(nextReadTimeoutId);
-                  setBpm(bpm + 1);
-                }}
-              >
-                +
-              </button>
+              <div className="flex items-center border rounded-md overflow-hidden w-fit">
+                <button
+                  className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
+                  onClick={() => {
+                    clearTimeout(nextReadTimeoutId);
+                    setBpm(bpm - 1);
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  className="w-16 text-center outline-none"
+                  value={bpm}
+                  onChange={(e) => {
+                    clearTimeout(nextReadTimeoutId);
+                    setBpm(Number(e.target.value));
+                  }}
+                />
+                <button
+                  className="px-3 py-1 font-bold text-3xl text-blue-500 bg-gray-100 hover:bg-gray-200"
+                  onClick={() => {
+                    clearTimeout(nextReadTimeoutId);
+                    setBpm(bpm + 1);
+                  }}
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div className="flex gap-3">
               <button
@@ -176,6 +177,7 @@ export default function Home() {
                 className={`px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400`}
                 onClick={() => {
                   clearTimeout(nextReadTimeoutId);
+                  setCurrentFigureName('');
                 }}
               >
                 STOP
